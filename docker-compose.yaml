@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD : ${DB_PASSWORD} # PWD IN LOCAL ENV
 
     volumes:
-      - pgdata:/var/lib/postgresql/myOdooDB-data # VOLUMES PATH FOR DB
+      - pgdata:/var/lib/postgresql/data # VOLUMES PATH FOR DB
       - ./db/init:/docker-entrypoint-initdb.d # SCHEMAS DB/SEED/INIT
 
     healthcheck:
@@ -20,13 +20,15 @@ services:
       retries: 5
 
   app :
-    build : Docker/. # dockerfile in repertory
+    build :
+      context: .
+      dockerfile: Docker/Dockerfile # dockerfile in repertory
     environment:
       DATABASE_URL : postgresql://app:${DB_PASSWORD}@db:5432/myOdooDB
       #CONNEXION URL OF THE DB (USE PORT : 5432)
     depends_on:
       db :
         condition: service_healthy
-    command: uv run main.py # COMMAND
-    stdin_open: true # OPEN STDIN OF APP CONTAINER MAYBE REMOVE IT LATER
-    tty: true # ASSIGN TERMINAL TO CONTAINER
+
+volumes :
+  pgdata :
